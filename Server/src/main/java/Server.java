@@ -50,20 +50,44 @@ public class Server {
     public void privateMessage(NewClient sender, String msg){
         String receiver = msg.split(" ", 3)[1];
         for (NewClient c: clients){
-            if(c.getNickName().equals(receiver)){
+            if(c.getNickName().equals(receiver)&&!c.getNickName().equals(sender.getNickName())){
                 String message = "@"+sender.getNickName()+" to @"+c.getNickName()+": "+msg.split(" ", 3)[2];
                 c.sendMsg(message);
                 sender.sendMsg(message);
             }
         }
     }
+    public boolean isLoginAuthenticated(String login){
+        for (NewClient c: clients){
+            if(c.getLogin().equals(login)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void broadcastClientList (){
+        StringBuilder sb = new StringBuilder("/clientlist");
+        for (NewClient c: clients){
+            sb.append(" ").append(c.getNickName());
+        }
+        String msg = sb.toString();
+        for (NewClient c: clients){
+            c.sendMsg(msg);
+        }
+
+    }
+
+
 
     public void connect(NewClient client){
         clients.add(client);
+        broadcastClientList();
     }
 
     public void disconnect(NewClient client){
         clients.remove(client);
+        broadcastClientList();
     }
 
     public AuthenticationClass getauthClass() {
