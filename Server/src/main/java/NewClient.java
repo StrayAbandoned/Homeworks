@@ -65,14 +65,20 @@ public class NewClient {
                             } else sendMsg(ServiceMsg.REG_NO);
                         }
                     }
-
+                    socket.setSoTimeout(0);
                     while (isAuthenticated) {
-                        socket.setSoTimeout(0);
                         String s = in.readUTF();
                         if (s.startsWith("/")) {
                             if (s.equals(ServiceMsg.END)) {
                                 sendMsg(ServiceMsg.END);
                                 break;
+                            }
+                            if (s.startsWith("/ " + nickName)){
+                                String[] str = s.split(" ", 3);
+                                if(server.getauthClass().changeNickname(str[1], str[2])){
+                                   nickName =  str[2];
+                                   sendMsg(ServiceMsg.END);
+                                }
                             }
                             if (s.startsWith("/w")) {
                                 if (s.split(" ").length < 3) {

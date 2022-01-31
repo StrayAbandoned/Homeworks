@@ -1,6 +1,10 @@
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -10,15 +14,20 @@ public class Server {
     private ServerSocket server;
     private Socket socket;
     private List<NewClient> clients;
-    private AuthenticationClass authClass;
+    // private AuthenticationClass authClass;
+    private DbAuthentication db;
+
+
 
 
     Server() {
         clients = new CopyOnWriteArrayList<>();
-        authClass = new AuthenticationClass();
+        //authClass = new AuthenticationClass();
+        db = new DbAuthentication();
         try {
             server = new ServerSocket(PORT);
             System.out.println("Server started");
+
 
             while (true){
                 socket = server.accept();
@@ -90,7 +99,12 @@ public class Server {
         broadcastClientList();
     }
 
-    public AuthenticationClass getauthClass() {
-        return authClass;
+//    public AuthenticationClass getauthClass() {
+//        return authClass;
+//    }
+
+
+    public DbAuthentication getauthClass() {
+        return db;
     }
 }
