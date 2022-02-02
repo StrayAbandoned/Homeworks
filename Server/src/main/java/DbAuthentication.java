@@ -12,9 +12,7 @@ public class DbAuthentication implements Authentication{
         } catch (Exception e) {
             e.printStackTrace();
         }
-        finally {
-            //disconnectDB();
-        }
+
     }
 
 
@@ -25,7 +23,7 @@ public class DbAuthentication implements Authentication{
         stmt = connection.createStatement();
         System.out.println("Database connected");
     }
-    private void disconnectDB(){
+    public void disconnectDB(){
         try {
             if(!stmt.isClosed()){
                 stmt.close();

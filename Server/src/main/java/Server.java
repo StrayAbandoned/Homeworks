@@ -42,6 +42,7 @@ public class Server {
 
             try {
                 server.close();
+                db.disconnectDB();
             } catch (IOException e) {
                 e.printStackTrace();
             }

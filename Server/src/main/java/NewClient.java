@@ -43,7 +43,7 @@ public class NewClient {
                                 if (!server.isLoginAuthenticated(login)) {
                                     isAuthenticated = true;
                                     nickName = nick;
-                                    sendMsg(ServiceMsg.AUTH_OK+" " + nickName);
+                                    sendMsg(ServiceMsg.AUTH_OK+" " + nickName+" "+login);
                                     server.connect(this);
                                     System.out.println("Client " + nickName + " connected");
                                     break;

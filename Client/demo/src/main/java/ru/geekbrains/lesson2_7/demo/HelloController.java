@@ -23,6 +23,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class HelloController implements Initializable {
@@ -36,25 +38,28 @@ public class HelloController implements Initializable {
     private String nickName;
     private Stage stage, regStage;
     private RegController regController;
+    private History history;
+    private String loginStr;
 
     @FXML
-    public TextField textField;
+    private TextField textField;
     @FXML
-    public TextArea textArea;
+    private TextArea textArea;
     @FXML
-    public TextField login;
+    private TextField login;
     @FXML
-    public PasswordField password;
+    private PasswordField password;
     @FXML
-    public HBox loginbox;
+    private HBox loginbox;
     @FXML
-    public HBox msgpanel;
+    private HBox msgpanel;
     @FXML
-    public ListView<String> clientList;
+    private ListView<String> clientList;
 
 
     @FXML
     protected void sendText(ActionEvent actionEvent) {
+
         if (textField.getText().trim().length() > 0) {
             try {
                 out.writeUTF(textField.getText());
@@ -116,6 +121,12 @@ public class HelloController implements Initializable {
         }
         setTitle(nickName);
         textArea.clear();
+        history = new History(loginStr);
+        if (isAuthenticated){
+            showHistory();
+        }
+
+
 
     }
 
@@ -139,6 +150,7 @@ public class HelloController implements Initializable {
 
                             if (s.startsWith(ServiceMsg.AUTH_OK)) {
                                 nickName = s.split(" ")[1];
+                                loginStr = s.split(" ")[2];
                                 setAuthenticated(true);
                                 break;
                             }
@@ -149,6 +161,8 @@ public class HelloController implements Initializable {
                     }
 
                     while (isAuthenticated) {
+
+
                         String s = in.readUTF();
                         if (s.startsWith("/")) {
                             if (s.startsWith(ServiceMsg.END)) {
@@ -166,6 +180,7 @@ public class HelloController implements Initializable {
                             }
                         } else {
                             textArea.appendText(s + "\n");
+                            history.writeOnFile(s);
                         }
 
 
@@ -232,6 +247,10 @@ public class HelloController implements Initializable {
 
     }
 
+    public TextField getLogin() {
+        return login;
+    }
+
     public void tryToReg(String login, String password, String nickName) {
         if (socket == null || socket.isClosed()) {
             connect();
@@ -241,6 +260,21 @@ public class HelloController implements Initializable {
             out.writeUTF(msg);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void showHistory (){
+        if(history.getList()!=null){
+            List<String> list = new ArrayList<>(history.getList());
+            if(list.size()<100){
+                for (String s:list) {
+                    textArea.appendText(s+"\n");
+                }
+            } else {
+                for (int i = list.size()-101; i < list.size()-1 ; i++){
+                    textArea.appendText(list.get(i)+"\n");
+                }
+            }
         }
     }
 }
