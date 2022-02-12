@@ -266,14 +266,9 @@ public class HelloController implements Initializable {
     public void showHistory (){
         if(history.getList()!=null){
             List<String> list = new ArrayList<>(history.getList());
-            if(list.size()<100){
-                for (String s:list) {
-                    textArea.appendText(s+"\n");
-                }
-            } else {
-                for (int i = list.size()-101; i < list.size()-1 ; i++){
-                    textArea.appendText(list.get(i)+"\n");
-                }
+            for (int i = list.size()-1, j = 0; i >-1 ; i--, j++) {
+                textArea.appendText(list.get(i)+"\n");
+                if (j ==100) break;
             }
         }
     }

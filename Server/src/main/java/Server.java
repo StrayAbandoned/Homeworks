@@ -18,25 +18,23 @@ public class Server {
     private DbAuthentication db;
 
 
-
-
     Server() {
         clients = new CopyOnWriteArrayList<>();
         //authClass = new AuthenticationClass();
         db = new DbAuthentication();
         try {
             server = new ServerSocket(PORT);
-            System.out.println("Server started");
+            ServerStart.getLogger().info("Server started");
 
 
-            while (true){
+            while (true) {
                 socket = server.accept();
                 new NewClient(this, socket);
             }
 
 
-
         } catch (IOException e) {
+            ServerStart.getLogger().severe("Server failed");
             e.printStackTrace();
         } finally {
 
@@ -50,52 +48,56 @@ public class Server {
         }
 
     }
-    public void broadcast(NewClient client, String str){
-        String message = "@"+client.getNickName()+": "+str;
-        for (NewClient c: clients){
+
+    public void broadcast(NewClient client, String str) {
+        String message = "@" + client.getNickName() + ": " + str;
+        for (NewClient c : clients) {
             c.sendMsg(message);
         }
+        ServerStart.getLogger().fine(client.getNickName() + " sent message to everyone");
 
     }
-    public void privateMessage(NewClient sender, String msg){
+
+    public void privateMessage(NewClient sender, String msg) {
         String receiver = msg.split(" ", 3)[1];
-        for (NewClient c: clients){
-            if(c.getNickName().equals(receiver)&&!c.getNickName().equals(sender.getNickName())){
-                String message = "@"+sender.getNickName()+" to @"+c.getNickName()+": "+msg.split(" ", 3)[2];
+        for (NewClient c : clients) {
+            if (c.getNickName().equals(receiver) && !c.getNickName().equals(sender.getNickName())) {
+                String message = "@" + sender.getNickName() + " to @" + c.getNickName() + ": " + msg.split(" ", 3)[2];
                 c.sendMsg(message);
                 sender.sendMsg(message);
             }
         }
+        ServerStart.getLogger().fine(sender.getNickName() + " sent private message to " + receiver);
     }
-    public boolean isLoginAuthenticated(String login){
-        for (NewClient c: clients){
-            if(c.getLogin().equals(login)){
+
+    public boolean isLoginAuthenticated(String login) {
+        for (NewClient c : clients) {
+            if (c.getLogin().equals(login)) {
                 return true;
             }
         }
         return false;
     }
 
-    public void broadcastClientList (){
+    public void broadcastClientList() {
         StringBuilder sb = new StringBuilder("/clientlist");
-        for (NewClient c: clients){
+        for (NewClient c : clients) {
             sb.append(" ").append(c.getNickName());
         }
         String msg = sb.toString();
-        for (NewClient c: clients){
+        for (NewClient c : clients) {
             c.sendMsg(msg);
         }
 
     }
 
 
-
-    public void connect(NewClient client){
+    public void connect(NewClient client) {
         clients.add(client);
         broadcastClientList();
     }
 
-    public void disconnect(NewClient client){
+    public void disconnect(NewClient client) {
         clients.remove(client);
         broadcastClientList();
     }
